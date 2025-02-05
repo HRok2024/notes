@@ -1,9 +1,11 @@
 package com.secure.notes.services;
 
 import com.secure.notes.models.Note;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public interface NoteService {
     //유저가 새 노트를 만듬
     Note createNoteForUser(String username, String content);
