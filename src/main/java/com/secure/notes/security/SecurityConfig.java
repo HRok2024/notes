@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -22,10 +23,9 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests((requests) ->
                 requests
-                        .requestMatchers("/contact").permitAll()
-                        .requestMatchers("/public/**").permitAll()
                         .anyRequest().authenticated());
-        http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.csrf(AbstractHttpConfigurer::disable); //CSRF 중지(POST요청 시 CSRF토큰이 없으면 공격으로 간주)
+        //http.formLogin( withDefaults());
         http.httpBasic(withDefaults());
 
         return http.build();
