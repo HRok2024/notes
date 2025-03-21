@@ -7,12 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtils {
@@ -37,11 +39,14 @@ public class JwtUtils {
     //jwt 토큰을 생성
     public String generateTokenFromUsername(UserDetails userDetails) {
         String username = userDetails.getUsername();
+        String roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).collect(Collectors.joining(",")); //권한을 ,를 이용해서 나눠서 추가해준다(권한1, 권한2)
         return Jwts.builder()
-                .subject(username)
-                .issuedAt(new Date())
-                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
-                .signWith(key())
+                .subject(username) //이름은 subject에 추가
+                .claim("roles", roles) //권한은 claim에 추가
+                .issuedAt(new Date()) //발행일
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs)) //만료일자
+                .signWith(key()) //암호화
                 .compact();
     }
 
